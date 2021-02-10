@@ -1,5 +1,9 @@
 package nfc_reader;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -13,6 +17,11 @@ import java.util.List;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.smartcardio.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JWindow;
 
 public class NFC_Reader {
 	
@@ -32,10 +41,48 @@ public class NFC_Reader {
 	public static void main(String[] args) {
 		System.out.println("Hello");
 
+		Dimension size = Toolkit.getDefaultToolkit().getScreenSize(); 
+		int width = (int)size.getWidth() / 2 - 250; 
+		int height = (int)size.getHeight() / 2 - 150;
+
+		final JFrame window = new JFrame("Reid Hall RFID Reader"); 
+		window.setSize(500, 300);
+		window.setLocation(width, height);
+		
+		JPanel panel = new JPanel();
+        JTextArea text = new JTextArea(10,25);
+		JButton button = new JButton("Close");
+		
+		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				window.dispose();
+			}
+		});
+
 		try {
 			TerminalFactory factory = TerminalFactory.getDefault();
 			List<CardTerminal> terminals = factory.terminals().list();
+			
+			if (terminals.isEmpty()) {
+				text.append("No NFC reader found\n");
+				text.append("Please plug an NFC reader and start over\n");
+				panel.add(text);
+				panel.add(button);
+		        window.getContentPane().add(panel);
+		        window.pack(); 
+				window.setVisible(true);
+				
+			}
+			
 			CardTerminal terminal = terminals.get(0);
+			text.append("Reader found : " + terminal.getName() + "\n");				
+			panel.add(text);
+			panel.add(button);
+			window.getContentPane().add(panel);
+		    window.pack(); 
+		    window.setVisible(true);
+			panel.add(text);
 			
 			boolean waitForCard = true;
 			while(waitForCard) {
