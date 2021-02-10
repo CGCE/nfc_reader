@@ -48,42 +48,51 @@ public class NFC_Reader {
 		final JFrame window = new JFrame("Reid Hall RFID Reader"); 
 		window.setSize(500, 300);
 		window.setLocation(width, height);
-		
+
 		JPanel panel = new JPanel();
-        JTextArea text = new JTextArea(10,25);
-		JButton button = new JButton("Close");
-		
-		button.addActionListener(new ActionListener() {
+        JTextArea text = new JTextArea(5,25);
+		JButton button_close = new JButton("Close");
+		JButton button_exit = new JButton("Close");
+
+		button_close.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				window.dispose();
 			}
 		});
 
+		button_exit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				window.dispose();
+				System.exit(0);
+			}
+		});
+
 		try {
 			TerminalFactory factory = TerminalFactory.getDefault();
 			List<CardTerminal> terminals = factory.terminals().list();
-			
+
 			if (terminals.isEmpty()) {
-				text.append("No NFC reader found\n");
-				text.append("Please plug an NFC reader and start over\n");
+				text.append("\nNo NFC reader found !\n");
+				text.append("Please plug a NFC reader and start over.\n");
 				panel.add(text);
-				panel.add(button);
+				panel.add(button_exit);
 		        window.getContentPane().add(panel);
 		        window.pack(); 
 				window.setVisible(true);
-				
 			}
-			
+
 			CardTerminal terminal = terminals.get(0);
-			text.append("Reader found : " + terminal.getName() + "\n");				
+			text.append("\nReader found : " + terminal.getName() + "\n");
+			text.append("Ready to scan !\n");
+			text.append("You can close this window.\n");
 			panel.add(text);
-			panel.add(button);
+			panel.add(button_close);
 			window.getContentPane().add(panel);
 		    window.pack(); 
 		    window.setVisible(true);
-			panel.add(text);
-			
+
 			boolean waitForCard = true;
 			while(waitForCard) {
 				waitForCard = terminal.waitForCardPresent(0);
