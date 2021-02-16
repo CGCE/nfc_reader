@@ -6,13 +6,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.Certificate;
 import java.util.List;
+import java.util.Properties;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLPeerUnverifiedException;
@@ -29,8 +34,8 @@ public class NFC_Reader {
 	    return String.format("%0" + (data.length * 2) + "X", new BigInteger(1,data));
 	}
 	
-	static String login = "101012";
-	static String password = "ybevpqzehviad";
+	static String login;
+	static String password;
 	static String intranet_url = "https://intranet.reidhall.com/Annuaire/RFID/post.php";
 	static String action = "record";
 	static String USER_AGENT = "Mozilla/5.0";
@@ -39,8 +44,25 @@ public class NFC_Reader {
 	static String uid = "";
 	
 	public static void main(String[] args) {
-		System.out.println("Hello");
 
+		// Get login and password from ~/nfc_reader.properties
+		String user_home = System.getProperty("user.home");
+
+		try (InputStream input = new FileInputStream(user_home + "/nfc_reader.properties")) {
+
+			Properties prop = new Properties();
+			prop.load(input);
+			login = prop.getProperty("login");
+			password = prop.getProperty("password");
+
+		} catch (IOException ex) {
+			System.out.println(ex);
+			System.exit(0);
+		}
+
+		System.out.println("Hello " + login);
+
+		// Prepare the  JFrame
 		Dimension size = Toolkit.getDefaultToolkit().getScreenSize(); 
 		int width = (int)size.getWidth() / 2 - 250; 
 		int height = (int)size.getHeight() / 2 - 150;
@@ -69,6 +91,7 @@ public class NFC_Reader {
 			}
 		});
 
+		// Connection to the reader
 		try {
 			TerminalFactory factory = TerminalFactory.getDefault();
 			List<CardTerminal> terminals = factory.terminals().list();
@@ -85,7 +108,7 @@ public class NFC_Reader {
 
 			CardTerminal terminal = terminals.get(0);
 			text.append("\nReader found : " + terminal.getName() + "\n");
-			text.append("Ready to scan !\n");
+			text.append("Ready to scan as " + login + "!\n");
 			text.append("You can close this window.\n");
 			panel.add(text);
 			panel.add(button_close);
