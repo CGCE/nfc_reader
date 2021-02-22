@@ -47,8 +47,9 @@ public class NFC_Reader {
 
 		// Get login and password from ~/nfc_reader.properties
 		String user_home = System.getProperty("user.home");
+		String sep = System.getProperty("file.separator");
 
-		try (InputStream input = new FileInputStream(user_home + "/nfc_reader.properties")) {
+		try (InputStream input = new FileInputStream(user_home + sep + "nfc_reader.properties")) {
 
 			Properties prop = new Properties();
 			prop.load(input);
